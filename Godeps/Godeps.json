@@ -1,0 +1,20 @@
+{
+	"ImportPath": "github.com/hbbb/surfbot",
+	"GoVersion": "go1.8",
+	"GodepVersion": "v79",
+	"Packages": [
+		"./"
+	],
+	"Deps": [
+		{
+			"ImportPath": "github.com/joho/godotenv",
+			"Comment": "v1.2.0-4-g6d367c1",
+			"Rev": "6d367c18edf6ca7fd004efd6863e4c5728fa858e"
+		},
+		{
+			"ImportPath": "github.com/joho/godotenv/autoload",
+			"Comment": "v1.2.0-4-g6d367c1",
+			"Rev": "6d367c18edf6ca7fd004efd6863e4c5728fa858e"
+		}
+	]
+}
