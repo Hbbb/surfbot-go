@@ -26,6 +26,16 @@ type Report struct {
 	MetaData  meta     `json:"_metadata"`
 }
 
+// Webpage returns the URL to the report on surfline.com
+func (r Report) Webpage() string {
+	spotPages := map[string]string{
+		"South San Diego":        "http://www.surfline.com/surf-forecasts/southern-california/south-san-diego_2953/",
+		"North San Diego":        "http://www.surfline.com/surf-forecasts/southern-california/north-san-diego_2144",
+		"Nassau - Queens County": "http://www.surfline.com/surf-forecasts/long-island/nassau-queens-county_131699"}
+
+	return spotPages[r.SpotName]
+}
+
 // analysis contains the specific surf report details
 type analysis struct {
 	Description []string `json:"generalText"`

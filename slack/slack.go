@@ -7,31 +7,8 @@ import (
 	_ "github.com/joho/godotenv/autoload" // autoloads environment variables; remove before deploying
 )
 
-// Slack API Format
-// {
-// 		 "title": "SurfBot"
-//     "attachments": [
-//         {
-//             "color": "#36a64f",
-//             "pretext": "Surf Reports 11/15/2017",
-//             "title": "South San Diego",
-//             "title_link": "https://surfline.com/",
-//             "text": "3-4 ft. Occasional 5 ft. on standout sets",
-//             "fields": [
-//                 {
-//                     "title": "Surf Max",
-//                     "value": "5",
-//                     "short": true
-//                 },
-// 				                {
-//                     "title": "Surf Min",
-//                     "value": "2",
-//                     "short": true
-//                 }
-//             ]
-//         }
-//     ]
-// }
+// Slack Message Format
+// https://api.slack.com/docs/messages/builder?msg=%7B%22attachments%22%3A%5B%7B%22color%22%3A%22%2336a64f%22%2C%22pretext%22%3A%22Surf%20Reports%2011%2F15%2F2017%22%2C%22title%22%3A%22South%20San%20Diego%22%2C%22title_link%22%3A%22https%3A%2F%2Fsurfline.com%2F%22%2C%22text%22%3A%223-4%20ft.%20Occasional%205%20ft.%20on%20standout%20sets%22%2C%22fields%22%3A%5B%7B%22title%22%3A%22Surf%20Max%22%2C%22value%22%3A%225%22%2C%22short%22%3Atrue%7D%2C%7B%22title%22%3A%22Surf%20Min%22%2C%22value%22%3A%222%22%2C%22short%22%3Atrue%7D%5D%7D%5D%7D
 
 // URL is the slack webhook url
 var URL = os.Getenv("SLACK_URL")
@@ -72,7 +49,7 @@ func buildAttachments(reports []surfline.Report) []attachment {
 		attachment := attachment{
 			Title:       report.SpotName,
 			Color:       "#679AB0",
-			Link:        "https://new.surfline.com/", // TODO: Make this point to the current spot
+			Link:        report.Webpage(),
 			Headline:    report.Surf.Text(),
 			SurfHeights: buildFields(report),
 		}
