@@ -59,7 +59,6 @@ func GetReports() []Report {
 
 		if err != nil {
 			log.Fatal(err)
-			panic(err.Error())
 		}
 
 		reports = append(reports, report)
@@ -74,20 +73,17 @@ func fetchSurfReport(id string) (Report, error) {
 	res, err := http.Get(url)
 
 	if err != nil {
-		log.Fatal(err)
 		return Report{}, err
 	}
 
+	defer res.Body.Close()
 	parsedReport, err := ioutil.ReadAll(res.Body)
 
 	if err != nil {
-		log.Fatal(err)
 		return Report{}, err
 	}
 
 	json.Unmarshal(parsedReport, &report)
-
-	defer res.Body.Close()
 
 	return report, nil
 }

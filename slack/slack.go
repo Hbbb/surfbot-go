@@ -1,15 +1,10 @@
 package slack
 
 import (
-	"bytes"
-	"encoding/json"
-	"fmt"
-	"log"
-	"net/http"
 	"os"
 
 	"github.com/hbbb/surfbot/surfline"
-	"github.com/joho/godotenv"
+	_ "github.com/joho/godotenv/autoload" // autoloads environment variables; remove before deploying
 )
 
 // Slack API Format
@@ -38,7 +33,11 @@ import (
 //     ]
 // }
 
-type message struct {
+// URL is the slack webhook url
+var URL = os.Getenv("SLACK_URL")
+
+// Message is the top-level of the Slack webhook JSON body
+type Message struct {
 	Title       string
 	Attachments []attachment `json:"attachments"`
 }
@@ -57,28 +56,13 @@ type surfHeight struct {
 	Short bool   `json:"short"`
 }
 
-// SendMessage takes in a list of surf reports and sends them as a slack message
-func SendMessage(surfReports []surfline.Report) {
-	godotenv.Load()
-	slackURL := os.Getenv("SLACK_URL")
-	message := buildMessage(surfReports)
-
-	payload, _ := json.Marshal(message)
-	resp, err := http.Post(slackURL, "application/json", bytes.NewBuffer(payload))
-
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	fmt.Println(resp)
-}
-
-func buildMessage(reports []surfline.Report) attachment {
-	message := message{Title: "Surf Report"}
+// BuildMessage converts a list of surfline Reports into Slack Messages
+func BuildMessage(reports []surfline.Report) Message {
+	message := Message{Title: "Surf Report"}
 	attachments := buildAttachments(reports)
 	message.Attachments = attachments
 
-	return attachment{}
+	return message
 }
 
 func buildAttachments(reports []surfline.Report) []attachment {
@@ -88,7 +72,7 @@ func buildAttachments(reports []surfline.Report) []attachment {
 		attachment := attachment{
 			Title:       report.SpotName,
 			Color:       "#679AB0",
-			Link:        fmt.Sprintf("https://new.surfline.com/"),
+			Link:        "https://new.surfline.com/", // TODO: Make this point to the current spot
 			Headline:    report.Surf.Text(),
 			SurfHeights: buildFields(report),
 		}
@@ -99,17 +83,17 @@ func buildAttachments(reports []surfline.Report) []attachment {
 	return attachments
 }
 
-func buildFields(r surfline.Report) []surfHeight {
+func buildFields(report surfline.Report) []surfHeight {
 	var fields []surfHeight
 
 	maxHeight := surfHeight{
 		Title: "Max Height",
-		Value: r.Surf.Max(),
+		Value: report.Surf.Max(),
 		Short: true}
 
 	minHeight := surfHeight{
 		Title: "Min Height",
-		Value: r.Surf.Min(),
+		Value: report.Surf.Min(),
 		Short: true}
 
 	fields = append(fields, maxHeight)
