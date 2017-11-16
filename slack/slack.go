@@ -44,7 +44,7 @@ type Message struct {
 
 type attachment struct {
 	Color       string       `json:"color"`
-	Title       string       `json:"pretext"`
+	Title       string       `json:"title"`
 	Link        string       `json:"title_link"`
 	Headline    string       `json:"text"`
 	SurfHeights []surfHeight `json:"fields"`

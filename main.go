@@ -3,7 +3,6 @@ package main
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 
@@ -16,11 +15,9 @@ func main() {
 	message := slack.BuildMessage(surfReports)
 	payload, _ := json.Marshal(message)
 
-	resp, err := http.Post(slack.URL, "application/json", bytes.NewBuffer(payload))
+	_, err := http.Post(slack.URL, "application/json", bytes.NewBuffer(payload))
 
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	fmt.Println(resp)
 }
