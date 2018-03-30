@@ -1,6 +1,7 @@
 package slack
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/hbbb/surfbot/surfline"
@@ -34,7 +35,7 @@ type surfHeight struct {
 }
 
 // BuildMessage converts a list of surfline Reports into Slack Messages
-func BuildMessage(reports []surfline.Report) Message {
+func BuildMessage(reports <-chan surfline.Report) Message {
 	message := Message{Title: "Surf Report"}
 	attachments := buildAttachments(reports)
 	message.Attachments = attachments
@@ -42,10 +43,11 @@ func BuildMessage(reports []surfline.Report) Message {
 	return message
 }
 
-func buildAttachments(reports []surfline.Report) []attachment {
+func buildAttachments(reports <-chan surfline.Report) []attachment {
 	attachments := []attachment{}
 
-	for _, report := range reports {
+	fmt.Println("ranging over reports")
+	for report := range reports {
 		attachment := attachment{
 			Title:       report.SpotName,
 			Color:       "#679AB0",
@@ -53,6 +55,7 @@ func buildAttachments(reports []surfline.Report) []attachment {
 			Headline:    report.Surf.Text(),
 			SurfHeights: buildFields(report),
 		}
+		fmt.Println("finished ranging")
 
 		attachments = append(attachments, attachment)
 	}

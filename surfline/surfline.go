@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
 )
 
@@ -31,7 +30,8 @@ func (r Report) Webpage() string {
 	spotPages := map[string]string{
 		"South San Diego":        "http://www.surfline.com/surf-forecasts/southern-california/south-san-diego_2953/",
 		"North San Diego":        "http://www.surfline.com/surf-forecasts/southern-california/north-san-diego_2144",
-		"Nassau - Queens County": "http://www.surfline.com/surf-forecasts/long-island/nassau-queens-county_131699"}
+		"Nassau - Queens County": "http://www.surfline.com/surf-forecasts/long-island/nassau-queens-county_131699",
+	}
 
 	return spotPages[r.SpotName]
 }
@@ -61,39 +61,37 @@ type meta struct {
 }
 
 // GetReports fetches all surf reports in the spot id list
-func GetReports() []Report {
-	reports := Reports{}
+func GetReports() <-chan Report {
+	reports := make(chan Report)
 
 	for _, id := range surflineSpotIds {
-		report, err := fetchSurfReport(id)
-
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		reports = append(reports, report)
+		go fetchSurfReport(id, reports)
 	}
+
+	// for range surflineSpotIds {
+	// 	fmt.Println(<-reports)
+	// }
 
 	return reports
 }
 
-func fetchSurfReport(id string) (Report, error) {
+func fetchSurfReport(id string, result chan<- Report) {
 	report := Report{}
 	url := fmt.Sprintf("http://api.surfline.com/v1/forecasts/%s?%s", id, queryString)
 	res, err := http.Get(url)
 
 	if err != nil {
-		return Report{}, err
+		panic("Failed to fetch report")
 	}
 
 	defer res.Body.Close()
 	parsedReport, err := ioutil.ReadAll(res.Body)
 
 	if err != nil {
-		return Report{}, err
+		panic("Failed to parse report")
 	}
 
 	json.Unmarshal(parsedReport, &report)
 
-	return report, nil
+	result <- report
 }
